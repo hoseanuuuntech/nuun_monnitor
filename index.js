@@ -68,19 +68,19 @@
         case 'grid3':
           splitContainer.style.display = 'none';
           gridContainer.style.display = 'grid';
-          gridContainer.className = 'grid grid-cols-3 gap-4 h-[calc(100vh-200px)]';
+          gridContainer.className = 'grid grid-cols-3 gap-4 h-full';
           document.getElementById('btn-grid3').classList.add('active');
           break;
         case 'grid4':
           splitContainer.style.display = 'none';
           gridContainer.style.display = 'grid';
-          gridContainer.className = 'grid grid-cols-4 gap-4 h-[calc(100vh-200px)]';
+          gridContainer.className = 'grid grid-cols-4 gap-4 h-full';
           document.getElementById('btn-grid4').classList.add('active');
           break;
         case 'fullscreen':
           splitContainer.style.display = 'none';
           gridContainer.style.display = 'grid';
-          gridContainer.className = 'grid grid-cols-1 gap-4 h-[calc(100vh-200px)]';
+          gridContainer.className = 'grid grid-cols-1 gap-4 h-full';
           document.getElementById('btn-fullscreen').classList.add('active');
           break;
       }
