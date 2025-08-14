@@ -1,441 +1,523 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Security Monitor Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .camera-feed {
-            background: linear-gradient(45deg, #1a1a2e, #16213e);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .camera-feed::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
-        }
-        
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        .status-online { background: #10b981; }
-        .status-offline { background: #ef4444; }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .view-button {
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .view-button.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .camera-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.5) 100%);
-            pointer-events: none;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuun Tech CCTV Monitor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { 
+      font-family: 'Inter', sans-serif; 
+      transition: all 0.3s ease;
+    }
+    
+    .dark-mode {
+      background-color: #111827;
+      color: #f9fafb;
+    }
+    
+    .light-mode {
+      background-color: #f8fafc;
+      color: #1f2937;
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .light-mode .glass-effect {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .camera-feed {
+      background: linear-gradient(45deg, #1a1a2e, #16213e);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .light-mode .camera-feed {
+      background: linear-gradient(45deg, #e2e8f0, #cbd5e1);
+    }
+    
+    .camera-feed::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+      z-index: 1;
+    }
+    
+    .light-mode .camera-feed::before {
+      background: radial-gradient(circle at center, transparent 0%, rgba(255,255,255,0.3) 100%);
+    }
+    
+    .camera-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .camera-feed:hover .camera-video {
+      transform: scale(1.05);
+    }
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .status-online { background: #10b981; }
+    .status-offline { background: #ef4444; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .view-button {
+      transition: all 0.3s ease;
+    }
+    
+    .view-button.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 2;
+    }
+    
+    .light-mode .camera-overlay {
+      background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, transparent 20%, transparent 80%, rgba(255,255,255,0.5) 100%);
+    }
+    
+    .split-view-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      height: calc(100vh - 200px);
+    }
+    
+    .split-main-camera {
+      grid-column: 1;
+    }
+    
+    .split-side-cameras {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    .split-view-camera {
+      border-radius: 12px;
+      border: 1px solid #374151;
+      position: relative;
+      transition: border-color 0.3s ease;
+    }
+    
+    .light-mode .split-view-camera {
+      border-color: #d1d5db;
+    }
+    
+    .split-view-camera:hover {
+      border-color: #3b82f6;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #374151;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #3b82f6;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .header-dark {
+      background: rgba(17, 24, 39, 0.8);
+      border-bottom: 1px solid #374151;
+    }
+    
+    .header-light {
+      background: rgba(248, 250, 252, 0.8);
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .btn-dark {
+      background: rgba(55, 65, 81, 0.8);
+      border: 1px solid rgba(107, 114, 128, 0.3);
+    }
+    
+    .btn-light {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(209, 213, 219, 0.5);
+      color: #374151;
+    }
 
-        .split-view-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 16px;
-            height: calc(100vh - 200px);
-        }
+    .offline-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      z-index: 3;
+    }
 
-        .split-main-camera {
-            grid-column: 1;
-            grid-row: 1;
-        }
-
-        .split-side-cameras {
-            grid-column: 2;
-            grid-row: 1;
-            display: grid;
-            grid-template-rows: repeat(3, 1fr);
-            gap: 16px;
-        }
-
-        .split-view-camera {
-            border-radius: 12px;
-            border: 1px solid #374151;
-            position: relative;
-            transition: border-color 0.3s ease;
-        }
-
-        .split-view-camera:hover {
-            border-color: #3b82f6;
-        }
-    </style>
+    .offline-text {
+      color: #ef4444;
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <header class="glass-effect px-6 py-4 flex items-center justify-between border-b border-gray-800">
-        <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <i data-lucide="shield-check" class="w-6 h-6"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold">Nuun Tech CCTV Monitor</h1>
-                <p class="text-sm text-gray-400">Real-time monitoring</p>
-            </div>
-        </div>
-        
-        <div class="flex items-center space-x-4">
+<body class="dark-mode text-white min-h-screen">
+
+  <!-- Header -->
+  <header class="glass-effect header-dark px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+        <i data-lucide="shield-check" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold">Nuun Tech CCTV Monitor</h1>
+        <p class="text-sm text-gray-400">Real-time monitoring</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-6">
+      <!-- Dark Mode Toggle -->
+      <div class="flex items-center space-x-3">
+        <i data-lucide="sun" class="w-4 h-4 text-gray-400"></i>
+        <label class="toggle-switch">
+          <input type="checkbox" id="darkModeToggle" checked onchange="toggleDarkMode()">
+          <span class="slider"></span>
+        </label>
+        <i data-lucide="moon" class="w-4 h-4 text-gray-400"></i>
+      </div>
+      
+      <div class="flex items-center space-x-2">
+        <div class="status-indicator status-online"></div>
+        <span class="text-sm">System Online</span>
+      </div>
+      <div class="text-sm" id="currentTime">Loading...</div>
+    </div>
+  </header>
+
+  <!-- View Buttons -->
+  <div class="px-6 py-4 flex items-center justify-between border-b border-gray-800" id="viewButtonsContainer">
+    <div class="flex space-x-2">
+      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium active" onclick="setView('split')" id="btn-split">
+        <i data-lucide="square-split" class="w-4 h-4 inline mr-2"></i>Split View
+      </button>
+      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid3')" id="btn-grid3">
+        <i data-lucide="grid-3x3" class="w-4 h-4 inline mr-2"></i>3×3 Grid View
+      </button>
+      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid4')" id="btn-grid4">
+        <i data-lucide="layout-grid" class="w-4 h-4 inline mr-2"></i>4×4 Grid View
+      </button>
+      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('fullscreen')" id="btn-fullscreen">
+        <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Fullscreen
+      </button>
+    </div>
+  </div>
+
+  <!-- Camera Views -->
+  <div class="p-6">
+    <div id="splitViewContainer" class="split-view-container">
+      <div class="split-main-camera camera-feed split-view-camera group">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-16 h-16 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-4 left-4 z-10">
+          <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
             <div class="flex items-center space-x-2">
-                <div class="status-indicator status-online"></div>
-                <span class="text-sm text-gray-300">System Online</span>
+              <div class="status-indicator status-online"></div>
+              <span>Gerbang Utama</span>
             </div>
-            <div class="text-sm text-gray-400" id="currentTime">
-                2025-08-14 08:31:57
-            </div>
+          </div>
         </div>
-    </header>
+      </div>
 
-    <div class="px-6 py-4 flex items-center justify-between border-b border-gray-800">
-        <div class="flex space-x-2">
-            <button class="view-button px-4 py-2 rounded-lg text-sm font-medium bg-purple-600 active" onclick="setView('split')" id="btn-split">
-                <i data-lucide="square-split" class="w-4 h-4 inline mr-2"></i>Split View
-            </button>
-            <button class="view-button px-4 py-2 rounded-lg text-sm font-medium bg-blue-600" onclick="setView('grid3')" id="btn-grid3">
-                <i data-lucide="grid-3x3" class="w-4 h-4 inline mr-2"></i>3×3 Grid
-            </button>
-            <button class="view-button px-4 py-2 rounded-lg text-sm font-medium bg-green-600" onclick="setView('grid4')" id="btn-grid4">
-                <i data-lucide="layout-grid" class="w-4 h-4 inline mr-2"></i>4×4 Grid
-            </button>
-            <button class="view-button px-4 py-2 rounded-lg text-sm font-medium bg-gray-600" onclick="setView('fullscreen')" id="btn-fullscreen">
-                <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Fullscreen
-            </button>
+      <div class="split-side-cameras">
+        <div class="camera-feed split-view-camera group cursor-pointer">
+          <video class="camera-video" autoplay muted loop>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4">
+            <div class="w-full h-full flex items-center justify-center bg-gray-800">
+              <i data-lucide="video" class="w-8 h-8 text-gray-600"></i>
+            </div>
+          </video>
+          <div class="camera-overlay"></div>
+          <div class="absolute top-2 left-2 z-10">
+            <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+              <div class="flex items-center space-x-1">
+                <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+                <span>Ruang Tamu</span>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div class="camera-feed split-view-camera group cursor-pointer">
+          <video class="camera-video" autoplay muted loop>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+            <div class="w-full h-full flex items-center justify-center bg-gray-800">
+              <i data-lucide="video" class="w-8 h-8 text-gray-600"></i>
+            </div>
+          </video>
+          <div class="camera-overlay"></div>
+          <div class="absolute top-2 left-2 z-10">
+            <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+              <div class="flex items-center space-x-1">
+                <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+                <span>Dapur</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="camera-feed split-view-camera group cursor-pointer">
+          <video class="camera-video" autoplay muted loop style="filter: grayscale(100%);">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
+            <div class="w-full h-full flex items-center justify-center bg-gray-800">
+              <i data-lucide="video-off" class="w-8 h-8 text-gray-600"></i>
+            </div>
+          </video>
+          <div class="camera-overlay"></div>
+          <div class="offline-overlay">
+            <span class="offline-text">OFFLINE</span>
+          </div>
+          <div class="absolute top-2 left-2 z-10">
+            <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+              <div class="flex items-center space-x-1">
+                <div class="status-indicator status-offline" style="width: 6px; height: 6px;"></div>
+                <span>Gudang</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="p-6">
-        <!-- Split View Container -->
-        <div id="splitViewContainer" class="split-view-container">
-            <!-- Main Camera (Left Side) -->
-            <div class="split-main-camera camera-feed split-view-camera group">
-                <div class="camera-overlay"></div>
-                <div class="absolute top-4 left-4 z-10">
-                    <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <div class="status-indicator status-online"></div>
-                            <span>Gerbang Utama</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-4 right-4 z-10">
-                    <div class="glass-effect px-2 py-1 rounded text-xs font-mono">
-                        REC
-                    </div>
-                </div>
-                <div class="absolute bottom-4 left-4 z-10">
-                    <button class="glass-effect px-3 py-2 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 transition-colors">
-                        <i data-lucide="play" class="w-4 h-4 inline mr-2"></i>Playback
-                    </button>
-                </div>
-                <div class="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button class="glass-effect p-2 rounded-lg hover:bg-gray-700">
-                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="w-full h-full flex items-center justify-center">
-                    <i data-lucide="video" class="w-16 h-16 text-gray-600"></i>
-                </div>
+    <div id="cameraGrid" class="hidden grid grid-cols-3 gap-4 h-[calc(100vh-200px)]">
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 1</span>
             </div>
-
-            <!-- Side Cameras (Right Side) -->
-            <div class="split-side-cameras">
-                <div class="camera-feed split-view-camera group">
-                    <div class="camera-overlay"></div>
-                    <div class="absolute top-2 left-2 z-10">
-                        <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-                            <div class="flex items-center space-x-1">
-                                <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-                                <span>Ruang Tamu</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute top-2 right-2 z-10">
-                        <div class="glass-effect px-1 py-1 rounded text-xs font-mono">
-                            REC
-                        </div>
-                    </div>
-                    <div class="absolute bottom-2 right-2 z-10">
-                        <button class="glass-effect px-2 py-1 rounded text-xs font-medium bg-gray-800 hover:bg-gray-700 transition-colors">
-                            <i data-lucide="play" class="w-3 h-3 inline mr-1"></i>Playback
-                        </button>
-                    </div>
-                    <div class="w-full h-full flex items-center justify-center">
-                        <i data-lucide="video" class="w-8 h-8 text-gray-600"></i>
-                    </div>
-                </div>
-
-                <div class="camera-feed split-view-camera group">
-                    <div class="camera-overlay"></div>
-                    <div class="absolute top-2 left-2 z-10">
-                        <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-                            <div class="flex items-center space-x-1">
-                                <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-                                <span>Dapur</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute top-2 right-2 z-10">
-                        <div class="glass-effect px-1 py-1 rounded text-xs font-mono">
-                            REC
-                        </div>
-                    </div>
-                    <div class="absolute bottom-2 right-2 z-10">
-                        <button class="glass-effect px-2 py-1 rounded text-xs font-medium bg-gray-800 hover:bg-gray-700 transition-colors">
-                            <i data-lucide="play" class="w-3 h-3 inline mr-1"></i>Playback
-                        </button>
-                    </div>
-                    <div class="w-full h-full flex items-center justify-center">
-                        <i data-lucide="video" class="w-8 h-8 text-gray-600"></i>
-                    </div>
-                </div>
-
-                <div class="camera-feed split-view-camera group">
-                    <div class="camera-overlay"></div>
-                    <div class="absolute top-2 left-2 z-10">
-                        <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-                            <div class="flex items-center space-x-1">
-                                <div class="status-indicator status-offline" style="width: 6px; height: 6px;"></div>
-                                <span>Halaman Belakang</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute top-2 right-2 z-10">
-                        <div class="glass-effect px-1 py-1 rounded text-xs font-mono text-red-400">
-                            OFF
-                        </div>
-                    </div>
-                    <div class="absolute bottom-2 right-2 z-10">
-                        <button class="glass-effect px-2 py-1 rounded text-xs font-medium bg-gray-800 hover:bg-gray-700 transition-colors">
-                            <i data-lucide="play" class="w-3 h-3 inline mr-1"></i>Playback
-                        </button>
-                    </div>
-                    <div class="w-full h-full flex items-center justify-center">
-                        <i data-lucide="video-off" class="w-8 h-8 text-gray-600"></i>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-
-        <!-- Original Grid Container (Hidden by default) -->
-        <div id="cameraGrid" class="grid grid-cols-4 gap-4 h-[calc(100vh-200px)]" style="display: none;">
-            <div class="camera-feed rounded-xl border border-gray-700 relative group hover:border-blue-500 transition-colors">
-                <div class="camera-overlay"></div>
-                <div class="absolute top-4 left-4 z-10">
-                    <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <div class="status-indicator status-online"></div>
-                            <span>Gerbang Utama</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-4 right-4 z-10">
-                    <div class="glass-effect px-2 py-1 rounded text-xs font-mono">
-                        REC
-                    </div>
-                </div>
-                <div class="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button class="glass-effect p-2 rounded-lg hover:bg-gray-700">
-                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="w-full h-full flex items-center justify-center">
-                    <i data-lucide="video" class="w-12 h-12 text-gray-600"></i>
-                </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 2</span>
             </div>
-
-            <div class="camera-feed rounded-xl border border-gray-700 relative group hover:border-blue-500 transition-colors">
-                <div class="camera-overlay"></div>
-                <div class="absolute top-4 left-4 z-10">
-                    <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <div class="status-indicator status-online"></div>
-                            <span>Ruang Tamu</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-4 right-4 z-10">
-                    <div class="glass-effect px-2 py-1 rounded text-xs font-mono">
-                        REC
-                    </div>
-                </div>
-                <div class="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button class="glass-effect p-2 rounded-lg hover:bg-gray-700">
-                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="w-full h-full flex items-center justify-center">
-                    <i data-lucide="video" class="w-12 h-12 text-gray-600"></i>
-                </div>
-            </div>
-
-            <div class="camera-feed rounded-xl border border-gray-700 relative group hover:border-blue-500 transition-colors">
-                <div class="camera-overlay"></div>
-                <div class="absolute top-4 left-4 z-10">
-                    <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <div class="status-indicator status-online"></div>
-                            <span>Dapur</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-4 right-4 z-10">
-                    <div class="glass-effect px-2 py-1 rounded text-xs font-mono">
-                        REC
-                    </div>
-                </div>
-                <div class="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button class="glass-effect p-2 rounded-lg hover:bg-gray-700">
-                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="w-full h-full flex items-center justify-center">
-                    <i data-lucide="video" class="w-12 h-12 text-gray-600"></i>
-                </div>
-            </div>
-
-            <div class="camera-feed rounded-xl border border-gray-700 relative group hover:border-blue-500 transition-colors">
-                <div class="camera-overlay"></div>
-                <div class="absolute top-4 left-4 z-10">
-                    <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <div class="status-indicator status-offline"></div>
-                            <span>Halaman Belakang</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-4 right-4 z-10">
-                    <div class="glass-effect px-2 py-1 rounded text-xs font-mono text-red-400">
-                        OFF
-                    </div>
-                </div>
-                <div class="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button class="glass-effect p-2 rounded-lg hover:bg-gray-700">
-                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="w-full h-full flex items-center justify-center">
-                    <i data-lucide="video-off" class="w-12 h-12 text-gray-600"></i>
-                </div>
-            </div>
-
-            <div class="camera-feed rounded-xl border border-gray-700 relative group hover:border-blue-500 transition-colors">
-                <div class="camera-overlay"></div>
-                <div class="absolute top-4 left-4 z-10">
-                    <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <div class="status-indicator status-online"></div>
-                            <span>Kamar Tidur</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-4 right-4 z-10">
-                    <div class="glass-effect px-2 py-1 rounded text-xs font-mono">
-                        REC
-                    </div>
-                </div>
-                <div class="w-full h-full flex items-center justify-center">
-                    <i data-lucide="video" class="w-12 h-12 text-gray-600"></i>
-                </div>
-            </div>
-
-            <div class="camera-feed rounded-xl border border-gray-700 relative group hover:border-blue-500 transition-colors">
-                <div class="camera-overlay"></div>
-                <div class="absolute top-4 left-4 z-10">
-                    <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <div class="status-indicator status-online"></div>
-                            <span>Garasi</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-4 right-4 z-10">
-                    <div class="glass-effect px-2 py-1 rounded text-xs font-mono">
-                        REC
-                    </div>
-                </div>
-                <div class="w-full h-full flex items-center justify-center">
-                    <i data-lucide="video" class="w-12 h-12 text-gray-600"></i>
-                </div>
-            </div>
-
-            <div class="camera-feed rounded-xl border border-gray-700 relative opacity-50">
-                <div class="w-full h-full flex items-center justify-center">
-                    <div class="text-center">
-                        <i data-lucide="plus" class="w-8 h-8 text-gray-600 mx-auto mb-2"></i>
-                        <p class="text-sm text-gray-500">Tambah Kamera</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="camera-feed rounded-xl border border-gray-700 relative opacity-50">
-                <div class="w-full h-full flex items-center justify-center">
-                    <div class="text-center">
-                        <i data-lucide="plus" class="w-8 h-8 text-gray-600 mx-auto mb-2"></i>
-                        <p class="text-sm text-gray-500">Tambah Kamera</p>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10 pt-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop style="filter: grayscale(100%);">
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video-off" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="offline-overlay">
+          <span class="offline-text">OFFLINE</span>
+        </div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-offline" style="width: 6px; height: 6px;"></div>
+              <span>Camera 6</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 8</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
+        <video class="camera-video" autoplay muted loop>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4" type="video/mp4">
+          <div class="w-full h-full flex items-center justify-center bg-gray-800">
+            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
+          </div>
+        </video>
+        <div class="camera-overlay"></div>
+        <div class="absolute top-2 left-2 z-10">
+          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
+            <div class="flex items-center space-x-1">
+              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
+              <span>Camera 9</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="fixed bottom-0 left-0 right-0 glass-effect px-6 py-3 border-t border-gray-800">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="camera" class="w-4 h-4 text-green-400"></i>
-                    <span class="text-sm">6 Kamera Online</span>
-                </div>
-               
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="wifi" class="w-4 h-4 text-green-400"></i>
-                    <span class="text-sm">Network: Strong</span>
-                </div>
-            </div>
-            
-            <div class="text-sm text-gray-400">
-                Last Update: <span id="lastUpdate">2025-08-14 08:31:57</span>
-            </div>
-        </div>
-    </div>
-
-    <script src="index.js">
- 
-    </script>
+  <script src="index.js">
+  </script>
 </body>
 </html>
