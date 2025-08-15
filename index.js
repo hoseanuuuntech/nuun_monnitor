@@ -98,22 +98,36 @@
       document.getElementById('currentTime').textContent = timeString;
     }
 
-    function setMainCameraFromSide(cameraElement) {
-      const mainContainer = document.querySelector('.split-main-camera');
-      if (!mainContainer || !cameraElement) return;
+   function setMainCameraFromSide(cameraElement) {
+  const mainContainer = document.querySelector('.split-main-camera');
+  if (!mainContainer || !cameraElement) return;
 
-      const oldCamera = mainContainer.cloneNode(true);
-      const newCamera = cameraElement.cloneNode(true);
+  // Animasi keluar
+  mainContainer.classList.add('fade-out');
+  cameraElement.classList.add('fade-out');
 
-      mainContainer.replaceWith(newCamera);
-      cameraElement.replaceWith(oldCamera);
+  setTimeout(() => {
+    const oldCamera = mainContainer.cloneNode(true);
+    const newCamera = cameraElement.cloneNode(true);
 
-      newCamera.classList.add('split-main-camera');
-      oldCamera.classList.remove('split-main-camera');
+    mainContainer.replaceWith(newCamera);
+    cameraElement.replaceWith(oldCamera);
 
-      addCameraSwapListeners();
-      lucide.createIcons();
-    }
+    newCamera.classList.add('split-main-camera', 'fade-in');
+    oldCamera.classList.remove('split-main-camera');
+    oldCamera.classList.add('fade-in');
+
+    addCameraSwapListeners();
+    lucide.createIcons();
+
+    // Hapus class animasi setelah selesai
+    setTimeout(() => {
+      newCamera.classList.remove('fade-in');
+      oldCamera.classList.remove('fade-in');
+    }, 400);
+  }, 300);
+}
+
 
     function addCameraSwapListeners() {
       const sideCameras = document.querySelectorAll('.split-side-cameras .split-view-camera');

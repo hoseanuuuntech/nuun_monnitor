@@ -39,8 +39,19 @@
       background: linear-gradient(45deg, #1a1a2e, #16213e);
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
+    .camera-feed.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.camera-feed.fade-in {
+  opacity: 1;
+  transform: scale(1);
+}
     
     .light-mode .camera-feed {
       background: linear-gradient(45deg, #e2e8f0, #cbd5e1);
@@ -108,7 +119,7 @@
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 16px;
-      height: calc(100vh - 200px);
+      height: 100%;
     }
     
     .split-main-camera {
@@ -220,54 +231,37 @@
 </head>
 <body class="dark-mode text-white min-h-screen">
 
-  <!-- Header -->
-  <header class="glass-effect header-dark px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center space-x-4">
-      <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-        <i data-lucide="shield-check" class="w-6 h-6"></i>
-      </div>
-      <div>
-        <h1 class="text-xl font-bold">Nuun Tech CCTV Monitor</h1>
-        <p class="text-sm text-gray-400">Real-time monitoring</p>
-      </div>
-    </div>
-    <div class="flex items-center space-x-6">
-      <!-- Dark Mode Toggle -->
-      <div class="flex items-center space-x-3">
-        <i data-lucide="sun" class="w-4 h-4 text-gray-400"></i>
-        <label class="toggle-switch">
-          <input type="checkbox" id="darkModeToggle" checked onchange="toggleDarkMode()">
-          <span class="slider"></span>
-        </label>
-        <i data-lucide="moon" class="w-4 h-4 text-gray-400"></i>
-      </div>
-      
-      <div class="flex items-center space-x-2">
-        <div class="status-indicator status-online"></div>
-        <span class="text-sm">System Online</span>
-      </div>
-      <div class="text-sm" id="currentTime">Loading...</div>
-    </div>
-  </header>
+
 
   <!-- View Buttons -->
-  <div class="px-6 py-4 flex items-center justify-between border-b border-gray-800" id="viewButtonsContainer">
-    <div class="flex space-x-2">
-      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium active" onclick="setView('split')" id="btn-split">
-        <i data-lucide="square-split" class="w-4 h-4 inline mr-2"></i>Split View
-      </button>
-      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid3')" id="btn-grid3">
-        <i data-lucide="grid-3x3" class="w-4 h-4 inline mr-2"></i>3×3 Grid View
-      </button>
-      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid4')" id="btn-grid4">
-        <i data-lucide="layout-grid" class="w-4 h-4 inline mr-2"></i>4×4 Grid View
-      </button>
-      <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('fullscreen')" id="btn-fullscreen">
-        <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Fullscreen
-      </button>
-    </div>
+<div class="px-6 py-4 flex items-center justify-between border-b border-gray-800 group" id="viewButtonsContainer">
+  <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium active" onclick="setView('split')" id="btn-split">
+      <i data-lucide="square-split" class="w-4 h-4 inline mr-2"></i>Split View
+    </button>
+    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid3')" id="btn-grid3">
+      <i data-lucide="grid-3x3" class="w-4 h-4 inline mr-2"></i>3×3 Grid View
+    </button>
+    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid4')" id="btn-grid4">
+      <i data-lucide="layout-grid" class="w-4 h-4 inline mr-2"></i>4×4 Grid View
+    </button>
+    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('fullscreen')" id="btn-fullscreen">
+      <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Fullscreen
+    </button>
   </div>
 
+  <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium">
+      <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Prev
+    </button>
+    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium">
+      <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Next
+    </button>
+  </div>
+</div>
+
+
+      </div>
   <!-- Camera Views -->
   <div class="p-6">
     <div id="splitViewContainer" class="split-view-container">
