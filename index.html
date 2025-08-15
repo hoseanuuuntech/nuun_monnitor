@@ -8,76 +8,200 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body { 
       font-family: 'Inter', sans-serif; 
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: #f1f5f9;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+    
+    .view-selector {
+      position: absolute;
+      top: -70px; 
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 12px 16px;
+      border-radius: 0 0 16px 16px;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .main-container:hover .view-selector {
+      top: 0;
+    }
+    
+    .hover-trigger {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      z-index: 45;
+      background: transparent;
+    }
+    
+    .view-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
       transition: all 0.3s ease;
-    }
-    
-    .dark-mode {
-      background-color: #111827;
-      color: #f9fafb;
-    }
-    
-    .light-mode {
-      background-color: #f8fafc;
-      color: #1f2937;
-    }
-    
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.05);
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
     }
     
-    .light-mode .glass-effect {
-      background: rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(0, 0, 0, 0.1);
+    .view-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+    }
+    
+    .view-btn.active {
+      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+    
+    /* Camera Grid Layout */
+    .camera-grid {
+      display: grid;
+      height: calc(100% - 40px);
+      width: 100vw;
+      gap: 4px;
+      padding: 16px;
+      background: #0f172a;
+    }
+    
+    .split-view {
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: 1fr;
+    }
+    
+    .main-camera {
+      position: relative;
+      background: #1e293b;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    
+    .side-cameras {
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 4px;
+    }
+    
+    .grid-3x3 {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+    
+    .grid-4x4 {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
+    
+    .fullscreen {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
     }
     
     .camera-feed {
-      background: linear-gradient(45deg, #1a1a2e, #16213e);
       position: relative;
+      background: #1e293b;
+      border-radius: 8px;
       overflow: hidden;
-      opacity: 1;
-      transform: scale(1);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .camera-feed.fade-out {
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-.camera-feed.fade-in {
-  opacity: 1;
-  transform: scale(1);
-}
-    
-    .light-mode .camera-feed {
-      background: linear-gradient(45deg, #e2e8f0, #cbd5e1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
     }
     
-    .camera-feed::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
-      z-index: 1;
+    .camera-feed:hover {
+      border-color: #3b82f6;
+      transform: scale(1.02);
     }
     
-    .light-mode .camera-feed::before {
-      background: radial-gradient(circle at center, transparent 0%, rgba(255,255,255,0.3) 100%);
+    .camera-feed.active {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
     }
     
     .camera-video {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
     }
     
-    .camera-feed:hover .camera-video {
-      transform: scale(1.05);
+    .camera-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.4) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
+      pointer-events: none;
+    }
+    
+    .camera-info {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .camera-timestamp {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: white;
+      font-size: 11px;
+      font-weight: 500;
+      backdrop-filter: blur(5px);
     }
     
     .status-indicator {
@@ -86,432 +210,457 @@
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
-    .status-online { background: #10b981; }
-    .status-offline { background: #ef4444; }
+    
+    .status-online { 
+      background: #10b981; 
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+    
+    .status-offline { 
+      background: #ef4444;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+    
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      50% { opacity: 0.7; }
     }
     
-    .view-button {
-      transition: all 0.3s ease;
-    }
-    
-    .view-button.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    }
-    
-    .camera-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.5) 100%);
-      pointer-events: none;
-      transition: all 0.3s ease;
-      z-index: 2;
-    }
-    
-    .light-mode .camera-overlay {
-      background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, transparent 20%, transparent 80%, rgba(255,255,255,0.5) 100%);
-    }
-    
-    .split-view-container {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-      height: 100%;
-    }
-    
-    .split-main-camera {
-      grid-column: 1;
-    }
-    
-    .split-side-cameras {
-      display: grid;
-      grid-template-rows: repeat(3, 1fr);
-      gap: 16px;
-    }
-    
-    .split-view-camera {
-      border-radius: 12px;
-      border: 1px solid #374151;
-      position: relative;
-      transition: border-color 0.3s ease;
-    }
-    
-    .light-mode .split-view-camera {
-      border-color: #d1d5db;
-    }
-    
-    .split-view-camera:hover {
-      border-color: #3b82f6;
-    }
-    
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
-    }
-    
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #374151;
-      transition: .4s;
-      border-radius: 24px;
-    }
-    
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    
-    input:checked + .slider {
-      background-color: #3b82f6;
-    }
-    
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-    
-    .header-dark {
-      background: rgba(17, 24, 39, 0.8);
-      border-bottom: 1px solid #374151;
-    }
-    
-    .header-light {
-      background: rgba(248, 250, 252, 0.8);
-      border-bottom: 1px solid #e5e7eb;
-    }
-    
-    .btn-dark {
-      background: rgba(55, 65, 81, 0.8);
-      border: 1px solid rgba(107, 114, 128, 0.3);
-    }
-    
-    .btn-light {
-      background: rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(209, 213, 219, 0.5);
-      color: #374151;
-    }
-
+    /* Offline Overlay */
     .offline-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
-      z-index: 3;
-    }
-
-    .offline-text {
+      align-items: center;
       color: #ef4444;
-      font-weight: 600;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      font-size: 18px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      animation: blink 1.5s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.6; }
+    }
+    
+    .control-buttons {
+      position: absolute;
+      bottom: -60px; 
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 40;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Show control buttons on hover */
+    .main-container:hover .control-buttons {
+      bottom: 20px;
+    }
+    
+    /* Trigger area for hover at bottom */
+    .hover-trigger-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      z-index: 35;
+      background: transparent;
+    }
+    
+    .control-btn {
+      background: rgba(0, 0, 0, 0.9);
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .control-btn:hover {
+      background: rgba(59, 130, 246, 0.8);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .loading-spinner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 30;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Transition Effects */
+    .camera-transitioning {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    /* Menu indicator - subtle hint that menu is available */
+    .menu-indicator {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.5) 50%, transparent 100%);
+      z-index: 51;
+      opacity: 0.6;
+      animation: menuHint 3s infinite;
+    }
+    
+    @keyframes menuHint {
+      0%, 90% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+    
+    /* Hide menu indicator when menu is visible */
+    .main-container:hover .menu-indicator {
+      opacity: 0;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .camera-grid {
+        margin-bottom: 30px;
+      }
+      
+      .view-selector {
+        padding: 8px 12px;
+        gap: 4px;
+      }
+      
+      .view-btn {
+        padding: 10px 16px;
+        font-size: 12px;
+      }
+      
+      .camera-info {
+        font-size: 10px;
+        padding: 6px 8px;
+      }
+      
+      .hover-trigger, .hover-trigger-bottom {
+        height: 40px;
+      }
     }
   </style>
 </head>
-<body class="dark-mode text-white min-h-screen">
+<body>
+  <div class="main-container">
+    <div class="menu-indicator"></div>
+    
+    <div class="hover-trigger"></div>
+    
+    <div class="view-selector">
+      <button class="view-btn active" onclick="setView('split')" id="btn-split">
+        Split View
+      </button>
+      <button class="view-btn" onclick="setView('grid3')" id="btn-grid3">
+        3×3 Grid View
+      </button>
+      <button class="view-btn" onclick="setView('grid4')" id="btn-grid4">
+        4×4 Grid View
+      </button>
+      <button class="view-btn" onclick="setView('fullscreen')" id="btn-fullscreen">
+        Fullscreen
+      </button>
+    </div>
 
-
-
-  <!-- View Buttons -->
-<div class="px-6 py-4 flex items-center justify-between border-b border-gray-800 group" id="viewButtonsContainer">
-  <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium active" onclick="setView('split')" id="btn-split">
-      <i data-lucide="square-split" class="w-4 h-4 inline mr-2"></i>Split View
-    </button>
-    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid3')" id="btn-grid3">
-      <i data-lucide="grid-3x3" class="w-4 h-4 inline mr-2"></i>3×3 Grid View
-    </button>
-    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('grid4')" id="btn-grid4">
-      <i data-lucide="layout-grid" class="w-4 h-4 inline mr-2"></i>4×4 Grid View
-    </button>
-    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium" onclick="setView('fullscreen')" id="btn-fullscreen">
-      <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Fullscreen
-    </button>
-  </div>
-
-  <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium">
-      <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Prev
-    </button>
-    <button class="view-button btn-dark px-4 py-2 rounded-lg text-sm font-medium">
-      <i data-lucide="maximize" class="w-4 h-4 inline mr-2"></i>Next
-    </button>
-  </div>
-</div>
-
-
-      </div>
-  <!-- Camera Views -->
-  <div class="p-6">
-    <div id="splitViewContainer" class="split-view-container">
-      <div class="split-main-camera camera-feed split-view-camera group">
+    <div id="cameraGrid" class="camera-grid split-view">
+      <div class="main-camera camera-feed active" id="mainCamera" data-camera="lobby">
         <video class="camera-video" autoplay muted loop>
           <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-16 h-16 text-gray-600"></i>
-          </div>
         </video>
         <div class="camera-overlay"></div>
-        <div class="absolute top-4 left-4 z-10">
-          <div class="glass-effect px-3 py-1 rounded-lg text-sm font-medium">
-            <div class="flex items-center space-x-2">
-              <div class="status-indicator status-online"></div>
-              <span>Gerbang Utama</span>
-            </div>
-          </div>
+        <div class="camera-timestamp" id="timestamp">2025-08-15 08:08:47</div>
+        <div class="camera-info">
+          <div class="status-indicator status-online"></div>
+          <span>Lobby Lift</span>
         </div>
       </div>
 
-      <div class="split-side-cameras">
-        <div class="camera-feed split-view-camera group cursor-pointer">
+      <div class="side-cameras" id="sideCameras">
+        <div class="camera-feed" data-camera="entrance" onclick="switchToMain(this)">
           <video class="camera-video" autoplay muted loop>
             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4">
-            <div class="w-full h-full flex items-center justify-center bg-gray-800">
-              <i data-lucide="video" class="w-8 h-8 text-gray-600"></i>
-            </div>
           </video>
           <div class="camera-overlay"></div>
-          <div class="absolute top-2 left-2 z-10">
-            <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-              <div class="flex items-center space-x-1">
-                <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-                <span>Ruang Tamu</span>
-              </div>
-            </div>
+          <div class="camera-timestamp">2025-08-15 08:08:47</div>
+          <div class="camera-info">
+            <div class="status-indicator status-online"></div>
+            <span>Entrance</span>
           </div>
         </div>
 
-        <div class="camera-feed split-view-camera group cursor-pointer">
+        <div class="camera-feed" data-camera="parking" onclick="switchToMain(this)">
           <video class="camera-video" autoplay muted loop>
             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
-            <div class="w-full h-full flex items-center justify-center bg-gray-800">
-              <i data-lucide="video" class="w-8 h-8 text-gray-600"></i>
-            </div>
           </video>
           <div class="camera-overlay"></div>
-          <div class="absolute top-2 left-2 z-10">
-            <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-              <div class="flex items-center space-x-1">
-                <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-                <span>Dapur</span>
-              </div>
-            </div>
+          <div class="camera-timestamp">2025-08-15 08:08:47</div>
+          <div class="camera-info">
+            <div class="status-indicator status-online"></div>
+            <span>Parking</span>
           </div>
         </div>
 
-        <div class="camera-feed split-view-camera group cursor-pointer">
+        <div class="camera-feed" data-camera="storage" onclick="switchToMain(this)">
           <video class="camera-video" autoplay muted loop style="filter: grayscale(100%);">
             <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
-            <div class="w-full h-full flex items-center justify-center bg-gray-800">
-              <i data-lucide="video-off" class="w-8 h-8 text-gray-600"></i>
-            </div>
           </video>
           <div class="camera-overlay"></div>
           <div class="offline-overlay">
-            <span class="offline-text">OFFLINE</span>
+            <span>OFFLINE</span>
           </div>
-          <div class="absolute top-2 left-2 z-10">
-            <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-              <div class="flex items-center space-x-1">
-                <div class="status-indicator status-offline" style="width: 6px; height: 6px;"></div>
-                <span>Gudang</span>
-              </div>
-            </div>
+          <div class="camera-timestamp">--:--:--</div>
+          <div class="camera-info">
+            <div class="status-indicator status-offline"></div>
+            <span>Storage</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="cameraGrid" class="hidden grid grid-cols-3 gap-4 h-[calc(100vh-200px)]">
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 1</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 2</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 3</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 4</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10 pt-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 5</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop style="filter: grayscale(100%);">
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video-off" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="offline-overlay">
-          <span class="offline-text">OFFLINE</span>
-        </div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-offline" style="width: 6px; height: 6px;"></div>
-              <span>Camera 6</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 7</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 8</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="camera-feed aspect-video rounded-lg border split-view-camera flex items-center justify-center relative">
-        <video class="camera-video" autoplay muted loop>
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4" type="video/mp4">
-          <div class="w-full h-full flex items-center justify-center bg-gray-800">
-            <i data-lucide="video" class="w-10 h-10 text-gray-600"></i>
-          </div>
-        </video>
-        <div class="camera-overlay"></div>
-        <div class="absolute top-2 left-2 z-10">
-          <div class="glass-effect px-2 py-1 rounded text-xs font-medium">
-            <div class="flex items-center space-x-1">
-              <div class="status-indicator status-online" style="width: 6px; height: 6px;"></div>
-              <span>Camera 9</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div id="gridCameras" class="hidden">
+    </div>
+
+    <div class="control-buttons">
+      <button class="control-btn" onclick="previousCamera()" title="Previous Camera">
+        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+      </button>
+      <button class="control-btn" onclick="nextCamera()" title="Next Camera">
+        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+      </button>
     </div>
   </div>
 
-  <script src="index.js">
+  <script>
+    let currentView = 'split';
+    let currentMainCamera = 0;
+    let isTransitioning = false;
+    
+    const cameraData = [
+      { id: 'lobby', name: 'Lobby Lift', status: 'online', video: 'BigBuckBunny.mp4' },
+      { id: 'entrance', name: 'Entrance', status: 'online', video: 'ElephantsDream.mp4' },
+      { id: 'parking', name: 'Parking', status: 'online', video: 'ForBiggerBlazes.mp4' },
+      { id: 'storage', name: 'Storage', status: 'offline', video: 'ForBiggerEscapes.mp4' },
+      { id: 'hallway', name: 'Hallway', status: 'online', video: 'Sintel.mp4' },
+      { id: 'office', name: 'Office', status: 'online', video: 'ForBiggerFun.mp4' },
+      { id: 'kitchen', name: 'Kitchen', status: 'online', video: 'ForBiggerJoyrides.mp4' },
+      { id: 'roof', name: 'Rooftop', status: 'online', video: 'ForBiggerMeltdowns.mp4' },
+      { id: 'basement', name: 'Basement', status: 'offline', video: 'TearsOfSteel.mp4' }
+    ];
+
+    function updateTimestamp() {
+      const now = new Date();
+      const timestamp = now.toISOString().slice(0, 19).replace('T', ' ');
+      const elements = document.querySelectorAll('.camera-timestamp');
+      elements.forEach(el => {
+        const camera = el.closest('.camera-feed');
+        if (camera && !camera.querySelector('.offline-overlay')) {
+          el.textContent = timestamp;
+        }
+      });
+    }
+
+    function setView(viewType) {
+      if (isTransitioning) return;
+      
+      currentView = viewType;
+      const grid = document.getElementById('cameraGrid');
+      const buttons = document.querySelectorAll('.view-btn');
+      
+      buttons.forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btn-${viewType}`).classList.add('active');
+      
+      grid.className = `camera-grid ${viewType === 'split' ? 'split-view' : viewType === 'grid3' ? 'grid-3x3' : viewType === 'grid4' ? 'grid-4x4' : 'fullscreen'}`;
+      
+      if (viewType === 'split') {
+        setupSplitView();
+      } else {
+        setupGridView(viewType);
+      }
+      
+      lucide.createIcons();
+    }
+
+    function setupSplitView() {
+      const grid = document.getElementById('cameraGrid');
+      grid.innerHTML = `
+        <div class="main-camera camera-feed active" id="mainCamera" data-camera="lobby">
+          <video class="camera-video" autoplay muted loop>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+          </video>
+          <div class="camera-overlay"></div>
+          <div class="camera-timestamp">2025-08-15 08:08:47</div>
+          <div class="camera-info">
+            <div class="status-indicator status-online"></div>
+            <span>Lobby Lift</span>
+          </div>
+        </div>
+        <div class="side-cameras">
+          ${cameraData.slice(1, 4).map(camera => `
+            <div class="camera-feed" data-camera="${camera.id}" onclick="switchToMain(this)">
+              <video class="camera-video" autoplay muted loop ${camera.status === 'offline' ? 'style="filter: grayscale(100%);"' : ''}>
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/${camera.video}" type="video/mp4">
+              </video>
+              <div class="camera-overlay"></div>
+              ${camera.status === 'offline' ? '<div class="offline-overlay"><span>OFFLINE</span></div>' : ''}
+              <div class="camera-timestamp">${camera.status === 'offline' ? '--:--:--' : '2025-08-15 08:08:47'}</div>
+              <div class="camera-info">
+                <div class="status-indicator status-${camera.status}"></div>
+                <span>${camera.name}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function setupGridView(viewType) {
+      const grid = document.getElementById('cameraGrid');
+      const cameraCount = viewType === 'grid3' ? 9 : viewType === 'grid4' ? 16 : 1;
+      const cameras = viewType === 'fullscreen' ? [cameraData[currentMainCamera]] : cameraData.slice(0, cameraCount);
+      
+      grid.innerHTML = cameras.map(camera => `
+        <div class="camera-feed ${viewType === 'fullscreen' ? 'active' : ''}" data-camera="${camera.id}" onclick="${viewType !== 'fullscreen' ? 'switchToMain(this)' : ''}">
+          <video class="camera-video" autoplay muted loop ${camera.status === 'offline' ? 'style="filter: grayscale(100%);"' : ''}>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/${camera.video}" type="video/mp4">
+          </video>
+          <div class="camera-overlay"></div>
+          ${camera.status === 'offline' ? '<div class="offline-overlay"><span>OFFLINE</span></div>' : ''}
+          <div class="camera-timestamp">${camera.status === 'offline' ? '--:--:--' : '2025-08-15 08:08:47'}</div>
+          <div class="camera-info">
+            <div class="status-indicator status-${camera.status}"></div>
+            <span>${camera.name}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchToMain(element) {
+      if (isTransitioning || currentView === 'fullscreen') return;
+      
+      isTransitioning = true;
+      const mainCamera = document.getElementById('mainCamera') || document.querySelector('.camera-feed.active');
+      if (!mainCamera) return;
+      
+      element.classList.add('camera-transitioning');
+      mainCamera.classList.add('camera-transitioning');
+      
+      setTimeout(() => {
+        const tempContent = mainCamera.innerHTML;
+        const tempDataCamera = mainCamera.getAttribute('data-camera');
+        
+        mainCamera.innerHTML = element.innerHTML;
+        mainCamera.setAttribute('data-camera', element.getAttribute('data-camera'));
+        
+        element.innerHTML = tempContent;
+        element.setAttribute('data-camera', tempDataCamera);
+        
+        element.classList.remove('camera-transitioning');
+        mainCamera.classList.remove('camera-transitioning');
+        element.classList.add('fade-in');
+        mainCamera.classList.add('fade-in');
+        
+        setTimeout(() => {
+          element.classList.remove('fade-in');
+          mainCamera.classList.remove('fade-in');
+          isTransitioning = false;
+        }, 500);
+        
+      }, 300);
+    }
+
+    function nextCamera() {
+      if (currentView === 'split') {
+        const sideCameras = document.querySelectorAll('.side-cameras .camera-feed');
+        if (sideCameras.length > 0) {
+          const randomCamera = sideCameras[Math.floor(Math.random() * sideCameras.length)];
+          switchToMain(randomCamera);
+        }
+      } else if (currentView === 'fullscreen') {
+        currentMainCamera = (currentMainCamera + 1) % cameraData.length;
+        setupGridView('fullscreen');
+      }
+    }
+
+    function previousCamera() {
+      if (currentView === 'split') {
+        const sideCameras = document.querySelectorAll('.side-cameras .camera-feed');
+        if (sideCameras.length > 0) {
+          const randomCamera = sideCameras[Math.floor(Math.random() * sideCameras.length)];
+          switchToMain(randomCamera);
+        }
+      } else if (currentView === 'fullscreen') {
+        currentMainCamera = (currentMainCamera - 1 + cameraData.length) % cameraData.length;
+        setupGridView('fullscreen');
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      switch(e.key) {
+        case 'ArrowLeft':
+          previousCamera();
+          break;
+        case 'ArrowRight':
+          nextCamera();
+          break;
+        case '1':
+          setView('split');
+          break;
+        case '2':
+          setView('grid3');
+          break;
+        case '3':
+          setView('grid4');
+          break;
+        case '4':
+          setView('fullscreen');
+          break;
+      }
+    });
+
+    // Initialize
+    setInterval(updateTimestamp, 1000);
+    updateTimestamp();
+    lucide.createIcons();
+    setView('split');
   </script>
 </body>
 </html>
